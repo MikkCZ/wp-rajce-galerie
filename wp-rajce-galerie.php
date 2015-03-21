@@ -17,6 +17,7 @@ function show_rajce_profile($atts, $content = NULL) {
 	$plugin_data = get_plugin_data(__FILE__);
 	shortcode_atts(
 		array('uzivatel' => NULL,
+			  'limit' => NULL,
 			  'popisky' => false,
 		),
 		$atts
@@ -50,7 +51,11 @@ function show_rajce_profile($atts, $content = NULL) {
 
 	$albums = array();
 	$i = 0;
+	$limit = $atts['limit'];
 	foreach ($rss_file->channel->item as $album) {
+		if($limit != NULL && $i == $limit) {
+			break;
+		}
 		$albums[$i]['title'] = str_replace($username . ' | ', '', $album->title);
 		$albums[$i]['album_url'] = $album->link;
 		$albums[$i]['thumbnail_url'] = $album->image->url;
