@@ -1,0 +1,28 @@
+div.wp-rajce-galerie {
+    margin-top: 10px;
+    text-align: center;
+}
+
+div.wp-rajce-galerie div.rajce-album {
+    display: inline-block;
+    margin: 10px 20px;
+    width: 180px;
+    height: 130px;
+    text-align: center;
+    background-image: url("../images/background.png");
+    background-repeat: no-repeat;
+    background-position: center top;
+    padding-top: 12px; /*nutne pro pozicovani pozadi*/
+    font-size: 90%;
+    vertical-align: top;
+}
+
+div.wp-rajce-galerie div.rajce-album img {
+    margin-bottom: 12px;
+    max-width: 106px;
+    max-height: 70px;
+}
+
+div.rajce-album img.rajce-thumbnail {
+    border: 1px solid silver;
+}
