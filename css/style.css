@@ -3,7 +3,7 @@ div.wp-rajce-galerie {
     text-align: center;
 }
 
-div.wp-rajce-galerie div.rajce-album {
+div.wp-rajce-galerie div.album {
     display: inline-block;
     margin: 10px 20px;
     width: 180px;
@@ -17,12 +17,13 @@ div.wp-rajce-galerie div.rajce-album {
     vertical-align: top;
 }
 
-div.wp-rajce-galerie div.rajce-album img {
-    margin-bottom: 12px;
+div.wp-rajce-galerie div.album img.thumbnail {
+	display: block;
+	margin-right: auto;
+    margin-bottom: 20px;
+	margin-left: auto;
     max-width: 106px;
     max-height: 70px;
+	border: 1px solid silver;
 }
 
-div.rajce-album img.rajce-thumbnail {
-    border: 1px solid silver;
-}
