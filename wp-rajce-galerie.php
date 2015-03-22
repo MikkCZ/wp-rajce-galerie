@@ -11,16 +11,21 @@ License:		GPL2
 
 defined('ABSPATH') or die();
 
+define(WP_RAJCE_GALERIE_PLUGIN_FILE, __FILE__);
+
+require_once 'wp-rajce-galerie-options.php';
+
 add_shortcode('rajce', 'show_rajce_profile');
 
 function show_rajce_profile($atts, $content = NULL) {
-	$plugin_data = get_plugin_data(__FILE__);
+	$plugin_data = get_wp_rajce_plugin_data();
 	shortcode_atts(
 		array('uzivatel' => NULL,
 			  'limit' => NULL,
 			  'popisky' => false,
 		),
-		$atts
+		$atts,
+		'rajce'
 	);
 	if ($atts['uzivatel'] == NULL) {
 		return sprintf('<!-- Nebyl zadán žádný uživatel (%s). -->', $plugin_data['Name']);
@@ -34,7 +39,7 @@ function show_rajce_profile($atts, $content = NULL) {
 	$rss_url = sprintf('http://%s.rajce.idnes.cz/?rss=news', $username);
 
 	$in_cache = trailingslashit(WP_CONTENT_DIR).sprintf('wp-rajce-galerie-cache/%s.rss', $username);
-	if( !is_file($in_cache) || !(time()-filemtime($in_cache) < 7200) ) {
+	if( !is_file($in_cache) || !(time()-filemtime($in_cache) < get_option('wp-rajce-plugin-cache-expiration')) ) {
 		$rss_file_content = file_get_contents($rss_url);
 		if(substring_in_array(' 404 Not Found', $http_response_header)) {
 			return sprintf('<!-- Zadaný uživatel neexistuje (%s). -->', $plugin_data['Name']);
@@ -93,5 +98,9 @@ function format_output($headline, $albums_from_rss, $show_titles) {
 	}
 	$output .= '</div>';
 	return $output;
+}
+
+function get_wp_rajce_plugin_data() {
+	return get_plugin_data(WP_RAJCE_GALERIE_PLUGIN_FILE);
 }
 
