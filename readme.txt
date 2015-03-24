@@ -1,5 +1,5 @@
 === WP Rajče galerie ===
-Contributors: MikkCZ
+Contributors: mikk_cz
 Donate link: http://www.mikk.cz/
 Tags: fotogalerie, Rajče, Rajče.net, shortcode
 Requires at least: 4.0
@@ -40,8 +40,8 @@ Jak nainstalovat:
 
 == Screenshots ==
 
-1. Ukázka shortcode v editoru stránky
-2. Ukázka vložené galerie
+1. Ukázka vložené galerie
+2. Ukázka shortcode v editoru stránky
 
 == Changelog ==
 
