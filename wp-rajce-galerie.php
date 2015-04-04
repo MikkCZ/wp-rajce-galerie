@@ -11,7 +11,7 @@ License:		GPL2
 
 defined('ABSPATH') or die();
 
-define(WP_RAJCE_GALERIE_PLUGIN_FILE, __FILE__);
+define('WP_RAJCE_GALERIE_PLUGIN_FILE', __FILE__);
 
 require_once 'wp-rajce-galerie-options.php';
 
@@ -19,7 +19,7 @@ add_shortcode('rajce', 'show_rajce_profile');
 
 function show_rajce_profile($atts, $content = NULL) {
 	$plugin_data = get_wp_rajce_plugin_data();
-	shortcode_atts(
+	$atts = shortcode_atts(
 		array('uzivatel' => NULL,
 			  'limit' => NULL,
 			  'popisky' => false,
