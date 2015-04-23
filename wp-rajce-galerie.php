@@ -3,7 +3,7 @@
 Plugin Name:	WP Rajče galerie
 Plugin URI:		https://github.com/MikkCZ/wp-rajce-galerie/
 Description:	Plugin pro jednoduché zobrazení seznamu fotogalerií uživatele Rajče.net.
-Version:		0.8.1
+Version:		0.8.2
 Author:			Michal Stanke
 Author URI:		http://www.mikk.cz/
 License:		GPL2
@@ -18,7 +18,6 @@ require_once 'wp-rajce-galerie-options.php';
 add_shortcode('rajce', 'show_rajce_profile');
 
 function show_rajce_profile($atts, $content = NULL) {
-	$plugin_data = get_wp_rajce_plugin_data();
 	$atts = shortcode_atts(
 		array('uzivatel' => NULL,
 			  'limit' => NULL,
@@ -28,12 +27,12 @@ function show_rajce_profile($atts, $content = NULL) {
 		'rajce'
 	);
 	if ($atts['uzivatel'] == NULL) {
-		return sprintf('<!-- Nebyl zadán žádný uživatel (%s). -->', $plugin_data['Name']);
+		return sprintf('<!-- Nebyl zadán žádný uživatel (%s). -->', get_wp_rajce_plugin_name());
 	}
 
 	$username = strtolower($atts['uzivatel']);
 	if(!ctype_alnum($username)) {
-		return sprintf('<!-- Zadaný uživatel je neplatný (%s). -->', $plugin_data['Name']);
+		return sprintf('<!-- Zadaný uživatel je neplatný (%s). -->', get_wp_rajce_plugin_name());
 	}
 
 	$rss_url = sprintf('http://%s.rajce.idnes.cz/?rss=news', $username);
@@ -42,7 +41,7 @@ function show_rajce_profile($atts, $content = NULL) {
 	if( !is_file($in_cache) || !(time()-filemtime($in_cache) < get_option('wp-rajce-plugin-cache-expiration')) ) {
 		$rss_file_content = file_get_contents($rss_url);
 		if(substring_in_array(' 404 Not Found', $http_response_header)) {
-			return sprintf('<!-- Zadaný uživatel neexistuje (%s). -->', $plugin_data['Name']);
+			return sprintf('<!-- Zadaný uživatel neexistuje (%s). -->', get_wp_rajce_plugin_name());
 		}
 		if(substring_in_array(' 200 OK', $http_response_header)) {
 			if(!file_exists(dirname($in_cache))) {
@@ -100,7 +99,7 @@ function format_output($headline, $albums_from_rss, $show_titles) {
 	return $output;
 }
 
-function get_wp_rajce_plugin_data() {
-	return get_plugin_data(WP_RAJCE_GALERIE_PLUGIN_FILE);
+function get_wp_rajce_plugin_name() {
+	return 'WP Rajče galerie';
 }
 

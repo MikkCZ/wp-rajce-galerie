@@ -3,8 +3,8 @@ Contributors: mikk_cz
 Donate link: http://www.mikk.cz/
 Tags: fotogalerie, Rajče, Rajče.net, shortcode
 Requires at least: 4.0
-Tested up to: 4.1.1
-Stable tag: 0.8.1
+Tested up to: 4.2
+Stable tag: 0.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ Jak nainstalovat:
 
 == Changelog ==
 
+= 0.8.2 =
+* Zrušení používání funkce get_plugin_data().
+
 = 0.8.1 =
 * Oprava Undefined index notice.
 
@@ -52,6 +55,9 @@ Jak nainstalovat:
 * First public release.
 
 == Upgrade Notice ==
+
+= 0.8.2 =
+* Zrušení používání funkce get_plugin_data().
 
 = 0.8.1 =
 * Oprava Undefined index notice.

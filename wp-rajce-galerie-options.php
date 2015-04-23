@@ -17,10 +17,9 @@ function register_wp_rajce_plugin_settings() {
 }
 
 function add_wp_rajce_plugin_menu() {
-	$plugin_data = get_wp_rajce_plugin_data();
 	add_options_page(
-		$plugin_data['Name'],
-		$plugin_data['Name'],
+		get_wp_rajce_plugin_name(),
+		get_wp_rajce_plugin_name(),
 		'manage_options',
 		'wp_rajce_plugin',
 		'wp_rajce_plugin_settings_page'
@@ -28,10 +27,8 @@ function add_wp_rajce_plugin_menu() {
 }
 
 function wp_rajce_plugin_settings_page() {
-	$plugin_data = get_wp_rajce_plugin_data();
 	print('<div class="wrap">');
-	printf('<h2>%s</h2>', $plugin_data['Name']);
-	printf('<p>%s</p>', $plugin_data['Description']);
+	printf('<h2>%s</h2>', get_wp_rajce_plugin_name());
 	print('<h2>Nastavení</h2>');
 	print('<form method="post" action="options.php">');
 	settings_fields('wp-rajce-plugin-option-group');
