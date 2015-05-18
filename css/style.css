@@ -1,29 +1,29 @@
-div.wp-rajce-galerie {
-    margin-top: 10px;
-    text-align: center;
+.wp-rajce-galerie {
+	margin-top: 10px;
+	text-align: center;
 }
 
-div.wp-rajce-galerie div.album {
-    display: inline-block;
-    margin: 10px 20px;
-    width: 180px;
-    height: 130px;
-    text-align: center;
-    background-image: url("../images/background.png");
-    background-repeat: no-repeat;
-    background-position: center top;
-    padding-top: 12px; /*nutne pro pozicovani pozadi*/
-    font-size: 90%;
-    vertical-align: top;
+.wp-rajce-galerie .album {
+	display: inline-block;
+	margin: 10px 20px;
+	width: 180px;
+	height: 130px;
+	vertical-align: top;
+	text-align: center;
+	font-size: 90%;
+	background-image: url("../images/background.png");
+	background-repeat: no-repeat;
+	background-position: center top;
+	padding-top: 12px; /*nutne pro pozicovani pozadi*/
 }
 
-div.wp-rajce-galerie div.album img.thumbnail {
+.wp-rajce-galerie .album .thumbnail {
 	display: block;
 	margin-right: auto;
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 	margin-left: auto;
-    max-width: 106px;
-    max-height: 70px;
+	max-width: 106px;
+	max-height: 70px;
 	border: 1px solid silver;
 }
 

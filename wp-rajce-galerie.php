@@ -9,87 +9,89 @@ Author URI:		http://www.mikk.cz/
 License:		GPL2
 */
 
-defined('ABSPATH') or die();
+defined( 'ABSPATH' ) or die();
 
-define('WP_RAJCE_GALERIE_PLUGIN_FILE', __FILE__);
+define( 'WP_RAJCE_GALERIE_PLUGIN_FILE', __FILE__ );
 
 require_once 'wp-rajce-galerie-options.php';
 
-add_shortcode('rajce', 'show_rajce_profile');
+add_shortcode( 'rajce', 'show_rajce_profile' );
 
-function show_rajce_profile($atts, $content = NULL) {
+function show_rajce_profile( $atts, $content = NULL ) {
 	$atts = shortcode_atts(
-		array('uzivatel' => NULL,
-			  'limit' => NULL,
-			  'popisky' => false,
+		array(
+			'uzivatel' => NULL,
+			'limit'    => NULL,
+			'popisky'  => false,
 		),
 		$atts,
 		'rajce'
 	);
-	if ($atts['uzivatel'] == NULL) {
-		return sprintf('<!-- Nebyl zadán žádný uživatel (%s). -->', get_wp_rajce_plugin_name());
+	if ( $atts['uzivatel'] == NULL ) {
+		return sprintf( '<!-- Nebyl zadán žádný uživatel (%s). -->', get_wp_rajce_plugin_name() );
 	}
 
-	$username = strtolower($atts['uzivatel']);
-	if(!ctype_alnum($username)) {
-		return sprintf('<!-- Zadaný uživatel je neplatný (%s). -->', get_wp_rajce_plugin_name());
+	$username = strtolower( $atts['uzivatel'] );
+	if ( ! ctype_alnum($username) ) {
+		return sprintf( '<!-- Zadaný uživatel je neplatný (%s). -->', get_wp_rajce_plugin_name() );
 	}
 
-	$rss_url = sprintf('http://%s.rajce.idnes.cz/?rss=news', $username);
+	$rss_url = sprintf( 'http://%s.rajce.idnes.cz/?rss=news', $username );
 
-	$in_cache = trailingslashit(WP_CONTENT_DIR).sprintf('wp-rajce-galerie-cache/%s.rss', $username);
-	if( !is_file($in_cache) || !(time()-filemtime($in_cache) < get_option('wp-rajce-plugin-cache-expiration')) ) {
-		$rss_file_content = file_get_contents($rss_url);
-		if(substring_in_array(' 404 Not Found', $http_response_header)) {
-			return sprintf('<!-- Zadaný uživatel neexistuje (%s). -->', get_wp_rajce_plugin_name());
+	$in_cache = trailingslashit( WP_CONTENT_DIR ).sprintf( 'wp-rajce-galerie-cache/%s.rss', $username );
+	$cache_expired = ( time() - filemtime($in_cache) ) > get_option( 'wp-rajce-plugin-cache-expiration' );
+	if ( ! is_file( $in_cache ) || $cache_expired ) {
+		$rss_file_content = file_get_contents( $rss_url );
+		if ( substring_in_array( ' 404 Not Found', $http_response_header ) ) {
+			return sprintf( '<!-- Zadaný uživatel neexistuje (%s). -->', get_wp_rajce_plugin_name() );
 		}
-		if(substring_in_array(' 200 OK', $http_response_header)) {
-			if(!file_exists(dirname($in_cache))) {
-				mkdir(dirname($in_cache));
+		if ( substring_in_array( ' 200 OK', $http_response_header ) ) {
+			if ( ! file_exists( dirname( $in_cache ) ) ) {
+				mkdir( dirname( $in_cache ) );
 			}
-			file_put_contents($in_cache, $rss_file_content);
+			file_put_contents( $in_cache, $rss_file_content );
 		}
 	}
-	$rss_file = simplexml_load_file($in_cache);
+	$rss_file = simplexml_load_file( $in_cache );
 
 	$albums = array();
 	$i = 0;
 	$limit = $atts['limit'];
-	foreach ($rss_file->channel->item as $album) {
-		if($limit != NULL && $i == $limit) {
+	foreach ( $rss_file->channel->item as $album ) {
+		if ( $limit != NULL && $i == $limit ) {
 			break;
 		}
-		$albums[$i]['title'] = str_replace($username . ' | ', '', $album->title);
-		$albums[$i]['album_url'] = $album->link;
-		$albums[$i]['thumbnail_url'] = $album->image->url;
+		$albums[ $i ]['title'] = str_replace( $username . ' | ', '', $album->title );
+		$albums[ $i ]['album_url'] = $album->link;
+		$albums[ $i ]['thumbnail_url'] = $album->image->url;
 		$i++;
 	}
 
-	$output = format_output($content, $albums, $atts['popisky']);
+	$output = format_output( $content, $albums, $atts['popisky'] );
 
-	wp_enqueue_style('wp-rajce-galerie', plugins_url('css/style.css', __FILE__));
+	wp_enqueue_style( 'wp-rajce-galerie', plugins_url( 'css/style.css', __FILE__ ) );
 	return $output;
 }
 
-function substring_in_array($substring, $array) {
-	foreach ($array as $value) {
-		if (strpos($value, $substring) !== false) {
+function substring_in_array( $substring, $array ) {
+	foreach ( $array as $value ) {
+		if ( strpos( $value, $substring ) !== false ) {
 			return true;
 		}
 	}
 	return false;
 }
 
-function format_output($headline, $albums_from_rss, $show_titles) {
+function format_output( $headline, $albums_from_rss, $show_titles ) {
 	$output = '<div class="wp-rajce-galerie">' . PHP_EOL;
-	if ($headline != NULL) {
-		$output .= sprintf('<h3>%s</h3>', $headline) . PHP_EOL;
+	if ( $headline != NULL ) {
+		$output .= sprintf( '<h3>%s</h3>', $headline ) . PHP_EOL;
 	}
-	foreach ($albums_from_rss as $album) {
+	foreach ( $albums_from_rss as $album ) {
 		$output .= '<div class="album">';
-		$output .= sprintf('<a href="%s">', $album['album_url']);
-		$output .= sprintf('<img src="%1$s" alt="%2$s" class="thumbnail">', $album['thumbnail_url'], $album['title']);
-		if ($show_titles) {
+		$output .= sprintf( '<a href="%s">', $album['album_url'] );
+		$output .= sprintf( '<img src="%1$s" alt="%2$s" class="thumbnail">', $album['thumbnail_url'], $album['title'] );
+		if ( $show_titles ) {
 			$output .= $album['title'];
 		}
 		$output .= '</a>';

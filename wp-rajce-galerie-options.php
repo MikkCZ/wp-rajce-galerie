@@ -1,19 +1,19 @@
 <?php
 
-defined('ABSPATH') or die();
+defined( 'ABSPATH' ) or die();
 
-register_activation_hook(WP_RAJCE_GALERIE_PLUGIN_FILE, 'wp_rajce_plugin_install');
-if (is_admin()){
-	add_action('admin_init', 'register_wp_rajce_plugin_settings');
-	add_action('admin_menu', 'add_wp_rajce_plugin_menu');
+register_activation_hook( WP_RAJCE_GALERIE_PLUGIN_FILE, 'wp_rajce_plugin_install' );
+if ( is_admin() ) {
+	add_action( 'admin_init', 'register_wp_rajce_plugin_settings' );
+	add_action( 'admin_menu', 'add_wp_rajce_plugin_menu' );
 }
 
 function wp_rajce_plugin_install() {
-	add_option('wp-rajce-plugin-cache-expiration', 7200);
+	add_option( 'wp-rajce-plugin-cache-expiration', 7200 );
 }
 
 function register_wp_rajce_plugin_settings() {
-	register_setting('wp-rajce-plugin-option-group', 'wp-rajce-plugin-cache-expiration');
+	register_setting( 'wp-rajce-plugin-option-group', 'wp-rajce-plugin-cache-expiration' );
 }
 
 function add_wp_rajce_plugin_menu() {
@@ -27,15 +27,14 @@ function add_wp_rajce_plugin_menu() {
 }
 
 function wp_rajce_plugin_settings_page() {
-	print('<div class="wrap">');
-	printf('<h2>%s</h2>', get_wp_rajce_plugin_name());
-	print('<h2>Nastavení</h2>');
-	print('<form method="post" action="options.php">');
-	settings_fields('wp-rajce-plugin-option-group');
-	do_settings_sections('wp-rajce-plugin-option-group');
-	print('<table class="form-table">');
-	printf('
-			<tr>
+	print( '<div class="wrap">' );
+	printf( '<h2>%s</h2>', get_wp_rajce_plugin_name() );
+	print( '<h2>Nastavení</h2>' );
+	print( '<form method="post" action="options.php">' );
+	settings_fields( 'wp-rajce-plugin-option-group' );
+	do_settings_sections( 'wp-rajce-plugin-option-group' );
+	print( '<table class="form-table">' );
+	printf( '<tr>
 				<th><label for="wp-rajce-plugin-cache-expiration">Expirace cache</label></th>
 				<td>
 					<input type="number" name="wp-rajce-plugin-cache-expiration" id="wp-rajce-plugin-cache-expiration" min="0" value="%s" required>
@@ -43,11 +42,11 @@ function wp_rajce_plugin_settings_page() {
 				</td>
 			</tr>
 			',
-			get_option('wp-rajce-plugin-cache-expiration')
+			get_option( 'wp-rajce-plugin-cache-expiration' )
 		);
-	print('</table>');
+	print( '</table>' );
 	submit_button();
-	print('</form>');
-	print('</div>');
+	print( '</form>' );
+	print( '</div>' );
 }
 
