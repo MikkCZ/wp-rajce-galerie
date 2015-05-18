@@ -47,7 +47,10 @@ function show_rajce_profile( $atts, $content = NULL ) {
 		}
 		if ( substring_in_array( ' 200 OK', $http_response_header ) ) {
 			if ( ! file_exists( dirname( $in_cache ) ) ) {
-				mkdir( dirname( $in_cache ) );
+				wp_mkdir_p( dirname( $in_cache ) );
+			}
+			if ( ! file_exists( dirname( $in_cache ).".htaccess" ) ) {
+				file_put_contents( dirname( $in_cache ).".htaccess", "deny from all", LOCK_EX );
 			}
 			file_put_contents( $in_cache, $rss_file_content );
 		}
