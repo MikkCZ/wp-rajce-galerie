@@ -3,7 +3,7 @@
 Plugin Name:	WP Rajče galerie
 Plugin URI:		https://github.com/MikkCZ/wp-rajce-galerie/
 Description:	Plugin pro jednoduché zobrazení seznamu fotogalerií uživatele Rajče.net.
-Version:		0.8.2
+Version:		0.9
 Author:			Michal Stanke
 Author URI:		http://www.mikk.cz/
 License:		GPL2
