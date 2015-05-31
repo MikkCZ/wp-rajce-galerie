@@ -30,11 +30,21 @@ function show_rajce_profile( $atts, $content = NULL ) {
 	if ( $atts['uzivatel'] == NULL ) {
 		return sprintf( '<!-- Nebyl zadán žádný uživatel (%s). -->', get_wp_rajce_plugin_name() );
 	}
-
 	$username = strtolower( $atts['uzivatel'] );
 	if ( ! ctype_alnum($username) ) {
 		return sprintf( '<!-- Zadaný uživatel je neplatný (%s). -->', get_wp_rajce_plugin_name() );
 	}
+
+	$limit = $atts['limit'];
+	if ( $limit == NULL ) {
+		$limit = PHP_INT_MAX;
+	} else if ( is_numeric($limit) && intval($limit) > 0 ) {
+		$limit = intval( $limit );
+	} else {
+		return sprintf( '<!-- Zadaný limit není kladné celé číslo (%s). -->', get_wp_rajce_plugin_name() );
+	}
+
+	$show_titles = filter_var($atts['popisky'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
 	$rss_url = sprintf( 'http://%s.rajce.idnes.cz/?rss=news', $username );
 
@@ -59,9 +69,8 @@ function show_rajce_profile( $atts, $content = NULL ) {
 
 	$albums = array();
 	$i = 0;
-	$limit = $atts['limit'];
 	foreach ( $rss_file->channel->item as $album ) {
-		if ( $limit != NULL && $i == $limit ) {
+		if ( $limit != NULL && $i >= $limit ) {
 			break;
 		}
 		$albums[ $i ]['title'] = str_replace( $username . ' | ', '', $album->title );
@@ -70,7 +79,7 @@ function show_rajce_profile( $atts, $content = NULL ) {
 		$i++;
 	}
 
-	$output = format_output( $content, $albums, $atts['popisky'] );
+	$output = format_output( $content, $albums, $show_titles );
 
 	wp_enqueue_style( 'wp-rajce-galerie', plugins_url( 'css/style.css', __FILE__ ) );
 	return $output;
