@@ -12,108 +12,34 @@ License:		GPL2
 defined( 'ABSPATH' ) or die();
 
 define( 'WP_RAJCE_GALERIE_PLUGIN_FILE', __FILE__ );
+define( 'WP_RAJCE_GALERIE_PLUGIN_DIR', trailingslashit( plugin_dir_path( WP_RAJCE_GALERIE_PLUGIN_FILE ) ) );
+define( 'WP_RAJCE_GALERIE_CACHE_FILES_DIR', trailingslashit(WP_CONTENT_DIR).'wp-rajce-galerie-cache/' );
 
-require_once 'wp-rajce-galerie-options.php';
+spl_autoload_register( 'wp_rajce_galerie_autoload' );
 
-add_shortcode( 'rajce', 'show_rajce_profile' );
-
-function show_rajce_profile( $atts, $content = NULL ) {
-	$atts = shortcode_atts(
-		array(
-			'uzivatel' => NULL,
-			'limit'    => NULL,
-			'popisky'  => false,
-		),
-		$atts,
-		'rajce'
-	);
-	if ( $atts['uzivatel'] == NULL ) {
-		return sprintf( '<!-- Nebyl zadán žádný uživatel (%s). -->', get_wp_rajce_plugin_name() );
-	}
-	$username = strtolower( $atts['uzivatel'] );
-	if ( ! ctype_alnum($username) ) {
-		return sprintf( '<!-- Zadaný uživatel je neplatný (%s). -->', get_wp_rajce_plugin_name() );
-	}
-
-	$limit = $atts['limit'];
-	if ( $limit == NULL ) {
-		$limit = PHP_INT_MAX;
-	} else if ( is_numeric($limit) && intval($limit) > 0 ) {
-		$limit = intval( $limit );
-	} else {
-		return sprintf( '<!-- Zadaný limit není kladné celé číslo (%s). -->', get_wp_rajce_plugin_name() );
-	}
-
-	$show_titles = filter_var($atts['popisky'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-	$rss_url = sprintf( 'http://%s.rajce.idnes.cz/?rss=news', $username );
-
-	$in_cache = trailingslashit( WP_CONTENT_DIR ).sprintf( 'wp-rajce-galerie-cache/%s.rss', $username );
-	$cache_expired = ( time() - filemtime($in_cache) ) > get_option( 'wp-rajce-plugin-cache-expiration' );
-	if ( ! is_file( $in_cache ) || $cache_expired ) {
-		$rss_file_content = file_get_contents( $rss_url );
-		if ( substring_in_array( ' 404 Not Found', $http_response_header ) ) {
-			return sprintf( '<!-- Zadaný uživatel neexistuje (%s). -->', get_wp_rajce_plugin_name() );
-		}
-		if ( substring_in_array( ' 200 OK', $http_response_header ) ) {
-			if ( ! file_exists( dirname( $in_cache ) ) ) {
-				wp_mkdir_p( dirname( $in_cache ) );
-			}
-			if ( ! file_exists( dirname( $in_cache ).".htaccess" ) ) {
-				file_put_contents( dirname( $in_cache ).".htaccess", "deny from all", LOCK_EX );
-			}
-			file_put_contents( $in_cache, $rss_file_content );
-		}
-	}
-	$rss_file = simplexml_load_file( $in_cache );
-
-	$albums = array();
-	$i = 0;
-	foreach ( $rss_file->channel->item as $album ) {
-		if ( $limit != NULL && $i >= $limit ) {
-			break;
-		}
-		$albums[ $i ]['title'] = str_replace( $username . ' | ', '', $album->title );
-		$albums[ $i ]['album_url'] = $album->link;
-		$albums[ $i ]['thumbnail_url'] = $album->image->url;
-		$i++;
-	}
-
-	$output = format_output( $content, $albums, $show_titles );
-
-	wp_enqueue_style( 'wp-rajce-galerie', plugins_url( 'css/style.css', __FILE__ ) );
-	return $output;
-}
-
-function substring_in_array( $substring, $array ) {
-	foreach ( $array as $value ) {
-		if ( strpos( $value, $substring ) !== false ) {
+/**
+ * Handles plugin classes autoloading (all should be prefixed by 'WP_Rajce_galerie_').
+ * 
+ * @param string $class_name
+ * @return true if the class has been loaded successfully
+ */
+function wp_rajce_galerie_autoload( $class_name ) {
+	if ( substr( $class_name, 0, strlen('WP_Rajce_galerie_') ) === 'WP_Rajce_galerie_' ) {
+		$class_path = WP_RAJCE_GALERIE_PLUGIN_DIR . 'classes/' . str_replace( "\\", '/', $class_name ) . '.php';
+		if ( file_exists( $class_path ) ) {
+			require $class_path;
 			return true;
 		}
 	}
 	return false;
 }
 
-function format_output( $headline, $albums_from_rss, $show_titles ) {
-	$output = '<div class="wp-rajce-galerie">' . PHP_EOL;
-	if ( $headline != NULL ) {
-		$output .= sprintf( '<h3>%s</h3>', $headline ) . PHP_EOL;
-	}
-	foreach ( $albums_from_rss as $album ) {
-		$output .= '<div class="album">';
-		$output .= sprintf( '<a href="%s">', $album['album_url'] );
-		$output .= sprintf( '<img src="%1$s" alt="%2$s" class="thumbnail">', $album['thumbnail_url'], $album['title'] );
-		if ( $show_titles ) {
-			$output .= $album['title'];
-		}
-		$output .= '</a>';
-		$output .= '</div>' . PHP_EOL;
-	}
-	$output .= '</div>';
-	return $output;
+// Plugin installation and admin options
+register_activation_hook( WP_RAJCE_GALERIE_PLUGIN_FILE, array('WP_Rajce_galerie_Options', 'install') );
+if ( is_admin() ){
+	add_action( 'admin_init', array('WP_Rajce_galerie_Options', 'register_settings') );
+	add_action( 'admin_menu', array('WP_Rajce_galerie_Options', 'add_menu') );
 }
 
-function get_wp_rajce_plugin_name() {
-	return 'WP Rajče galerie';
-}
-
+// Mozilla Latest Version shortcodes
+add_shortcode( 'rajce', array('WP_Rajce_galerie_Shortcode', 'show_rajce_profile') );
