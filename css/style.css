@@ -1,11 +1,11 @@
 .wp-rajce-galerie {
-	margin-top: 10px;
+	margin-top: 1.5em;
 	text-align: center;
 }
 
 .wp-rajce-galerie .album {
 	display: inline-block;
-	margin: 10px 20px;
+	margin: 1.5em;
 	width: 180px;
 	height: 130px;
 	vertical-align: top;
@@ -17,10 +17,10 @@
 	padding-top: 12px; /*nutne pro pozicovani pozadi*/
 }
 
-.wp-rajce-galerie .album .thumbnail {
+.wp-rajce-galerie .thumbnail {
 	display: block;
 	margin-right: auto;
-	margin-bottom: 20px;
+	margin-bottom: 1em;
 	margin-left: auto;
 	max-width: 106px;
 	max-height: 70px;
