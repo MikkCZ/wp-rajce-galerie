@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) or die();
 
 define( 'WP_RAJCE_GALERIE_PLUGIN_FILE', __FILE__ );
 define( 'WP_RAJCE_GALERIE_PLUGIN_DIR', trailingslashit( plugin_dir_path( WP_RAJCE_GALERIE_PLUGIN_FILE ) ) );
+define( 'WP_RAJCE_DATA_LOAD_TIMEOUT', 2 );
 define( 'WP_RAJCE_GALERIE_CACHE_FILES_DIR', trailingslashit(WP_CONTENT_DIR).'wp-rajce-galerie-cache/' );
 
 spl_autoload_register( 'wp_rajce_galerie_autoload' );

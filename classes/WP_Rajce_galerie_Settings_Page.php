@@ -32,6 +32,25 @@ class WP_Rajce_galerie_Settings_Page {
         settings_fields( $this->option_group );
         do_settings_sections( $this->option_group );
         print( '<table class="form-table">' );
+        printf('
+			<tr>
+				<th><label for="%1$s">Použitá cache</label></th>
+				<td>
+					<select name="%1$s" id="%1$s" required>
+						<option label="---" disabled></option>
+						<option value="%2$s"%3$s>WordPress Transients API</option>
+						<option value="%4$s"%5$s>Soubory</option>
+					</select>
+					<p class="description">Vybrat můžete ze dvou implementací cache. WordPress Transients API cache ukládá data ze serveru Rajče.net do databáze, nebo je můžete ukládat do Souborů.</p>
+				</td>
+			</tr>
+			',
+			$wp_rajce_galerie_options->cache_type(),
+			$wp_rajce_galerie_options->cache_type_transients_api(),
+			$this->if_selected_cache_type( $wp_rajce_galerie_options->cache_type_transients_api() ),
+			$wp_rajce_galerie_options->cache_type_files(),
+			$this->if_selected_cache_type( $wp_rajce_galerie_options->cache_type_files() )
+		);
         printf( '<tr>
             <th><label for="%1$s">Expirace cache</label></th>
                 <td>
@@ -48,6 +67,20 @@ class WP_Rajce_galerie_Settings_Page {
         print( '</form>' );
         
         print( '</div>' );
+	}
+	
+	/**
+	 * Outputs selected for $cache_type set.
+	 * 
+	 * @param string $cache_type
+	 * @return string selected for $cache_type
+	 */
+	private function if_selected_cache_type( $cache_type ) {
+		if ( WP_Rajce_galerie_Options::getInstance()->get_cache_type() == $cache_type ) {
+			return ' selected';
+		} else {
+			return '';
+		}
 	}
 
 }

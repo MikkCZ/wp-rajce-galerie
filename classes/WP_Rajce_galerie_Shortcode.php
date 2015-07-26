@@ -20,11 +20,11 @@ class WP_Rajce_galerie_Shortcode {
 		    'rajce'
 	    );
 	    if ( $atts['uzivatel'] == NULL ) {
-		    return sprint( '<!-- Nebyl zadán žádný uživatel (WP Rajče galerie). -->' );
+		    return '<!-- Nebyl zadán žádný uživatel (WP Rajče galerie). -->';
 	    }
 	    $username = strtolower( $atts['uzivatel'] );
 	    if ( ! ctype_alnum($username) ) {
-		    return sprint( '<!-- Zadaný uživatel je neplatný (WP Rajče galerie). -->' );
+		    return '<!-- Zadaný uživatel je neplatný (WP Rajče galerie). -->';
 	    }
 
 	    $limit = $atts['limit'];
@@ -33,32 +33,23 @@ class WP_Rajce_galerie_Shortcode {
 	    } else if ( is_numeric($limit) && intval($limit) > 0 ) {
 		    $limit = intval( $limit );
 	    } else {
-		    return sprint( '<!-- Zadaný limit není kladné celé číslo (WP Rajče galerie). -->' );
+		    return '<!-- Zadaný limit není kladné celé číslo (WP Rajče galerie). -->';
 	    }
 
 	    $show_titles = filter_var($atts['popisky'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-	    $rss_url = sprintf( 'http://%s.rajce.idnes.cz/?rss=news', $username );
-
-	    $in_cache = WP_RAJCE_GALERIE_CACHE_FILES_DIR.sprintf( '%s.rss', $username );
-	    $wp_rajce_galerie_options = WP_Rajce_galerie_Options::getInstance();
-	    $cache_refresh = ! is_file( $in_cache ) || ( time() - filemtime($in_cache) ) > $wp_rajce_galerie_options->get_cache_expire();
-	    if ( $cache_refresh ) {
-		    $rss_file_content = file_get_contents( $rss_url );
-		    if ( self::substring_in_array( ' 404 Not Found', $http_response_header ) ) {
-			    return sprint( '<!-- Zadaný uživatel neexistuje (WP Rajče galerie). -->' );
-		    }
-		    if ( self::substring_in_array( ' 200 OK', $http_response_header ) ) {
-			    if ( ! file_exists( dirname( $in_cache ) ) ) {
-				    wp_mkdir_p( dirname( $in_cache ) );
-			    }
-			    if ( ! file_exists( dirname( $in_cache )."/.htaccess" ) ) {
-				    file_put_contents( dirname( $in_cache )."/.htaccess", "deny from all", LOCK_EX );
-			    }
-			    file_put_contents( $in_cache, $rss_file_content, LOCK_EX );
-		    }
+	    
+	    $cache = WP_Rajce_galerie_Cache_Factory::get_cache();
+	    if ( $cache->valid($username) ) {
+	        $rss_file_content = $cache->get( $username );
+	    } else {
+	        $rss_file_content = self::load_from_url( $username );
+	        if ( $rss_file_content != NULL ) {
+	            $cache->store( $username, $rss_file_content );
+	        } else {
+	            $rss_file_content = $cache->get( $username );
+	        }
 	    }
-	    $rss_file = simplexml_load_file( $in_cache );
+	    $rss_file = simplexml_load_string( $rss_file_content );
 
 	    $albums = array();
 	    $i = 0;
@@ -76,6 +67,21 @@ class WP_Rajce_galerie_Shortcode {
 
 	    wp_enqueue_style( 'wp-rajce-galerie', plugins_url( 'css/style.css', WP_RAJCE_GALERIE_PLUGIN_FILE ) );
 	    return $output;
+    }
+
+    private function load_from_url( $username ) {
+        $rss_url = sprintf( 'http://%s.rajce.idnes.cz/?rss=news', $username );
+        $context = stream_context_create(
+			array(
+				'http' => array('timeout' => WP_RAJCE_DATA_LOAD_TIMEOUT)
+			)
+		);
+        $rss_file_content = @file_get_contents( $rss_url, false, $context );
+        if ( isset( $http_response_header ) && self::substring_in_array( ' 200 OK', $http_response_header ) ) {
+            return $rss_file_content;
+        } else {
+            return NULL;
+        }
     }
 
     private function substring_in_array( $substring, $array ) {
