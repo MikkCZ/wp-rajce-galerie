@@ -11,10 +11,6 @@
 	vertical-align: top;
 	text-align: center;
 	font-size: 90%;
-	background-image: url("../images/background.png");
-	background-repeat: no-repeat;
-	background-position: center top;
-	padding-top: 12px; /*nutne pro pozicovani pozadi*/
 }
 
 .wp-rajce-galerie .thumbnail {
