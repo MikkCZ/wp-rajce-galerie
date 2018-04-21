@@ -1,7 +1,7 @@
 === WP Rajče galerie ===
 Contributors: mikk_cz
-Donate link: http://www.mikk.cz/
-Tags: fotogalerie, Rajče, Rajče.net, shortcode
+Donate link: https://paypal.me/mstanke/100
+Tags: fotogalerie, Rajče, Rajče.net, shortcode, adopt-me
 Requires at least: 4.0
 Tested up to: 4.9.2
 Stable tag: 1.0
@@ -82,4 +82,3 @@ Jak nainstalovat:
 
 = 0.8 =
 * First public release.
-
